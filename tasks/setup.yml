@@ -1,7 +1,7 @@
 ---
 # tasks file for ansible-role-docker-container-drone
 - name: docker_container {{ docker_container_drone_name }} - Ensure S3 bucket exists
-  shell: |
+  ansible.builtin.shell: |
     mc alias set statelessminio {{ docker_container_drone_s3_endpoint }} {{ docker_container_drone_aws_access_key_id }} {{ docker_container_drone_aws_secret_access_key }}
     mc mb --ignore-existing statelessminio/{{ docker_container_drone_s3_bucket }}
   register: mc_mb_result
@@ -12,7 +12,7 @@
     - docker_container_drone_s3_bucket | length > 0
 
 - name: docker_container {{ docker_container_drone_name }} - Ensure S3 bucket exists result
-  debug:
+  ansible.builtin.debug:
     msg: "{{ mc_mb_result.stdout }}"
   when:
     - mc_mb_result is defined
