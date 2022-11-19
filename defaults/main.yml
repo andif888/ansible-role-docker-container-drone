@@ -1,0 +1,299 @@
+---
+# defaults file for ansible-role-docker-container-drone
+
+# ------------
+# Docker image
+# ------------
+
+# @var docker_image_drone_name:description: Repository path and tag for the container image.
+docker_image_drone_name: "drone/drone:2"
+
+# @var docker_image_drone_pull:description: Indicate to always pull the docker image.
+docker_image_drone_pull: no
+
+# ----------------
+# Docker container
+# ----------------
+
+# @var docker_container_drone_name:description: Name for the container
+docker_container_drone_name: "drone"
+
+# @var docker_container_drone_image:description: >
+# Repository path and tag used to create the container. 
+# If an image is not found or pull is true, the image will be pulled from the registry. 
+# If no tag is included, latest will be used.
+# @end
+docker_container_drone_image: "{{ docker_image_drone_name }}"
+
+# @var docker_container_drone_volume_dir:description: >
+# Volume mount host directory, where Treafik config files are stored.
+# @end
+docker_container_drone_volume_dir: "{{ docker_container__base__volume_dir }}/{{ docker_container_drone_name }}"
+
+# @var docker_container_drone_env:description: >
+# Dictionery of key,value pairs for docker 
+# environment variables to configure drone. 
+# @end
+docker_container_drone_env:
+  DRONE_GIT_ALWAYS_AUTH: "true"
+  DRONE_GITEA_SERVER: "http://localhost:3000"
+  DRONE_RPC_SECRET: "UAv3Y67LpLL3NrsbbSaV2qhHkSjoJARF"
+  DRONE_SERVER_PROTO: "http"
+  DRONE_TLS_AUTOCERT: "false"
+  DRONE_AGENTS_ENABLED: "true"
+  DRONE_USER_CREATE: "username:gitadmin,admin:true"
+  DRONE_LOGS_PRETTY: "true"
+  DRONE_LOGS_COLOR: "true"
+  DRONE_S3_ENDPOINT: "{{ docker_container_drone_s3_endpoint | default(omit) }}"
+  DRONE_S3_BUCKET: "{{ docker_container_drone_s3_bucket | default(omit) }}"
+  DRONE_S3_PATH_STYLE: "true"
+  AWS_ACCESS_KEY_ID: "{{ docker_container_drone_aws_access_key_id | default(omit) }}"
+  AWS_SECRET_ACCESS_KEY: "{{ docker_container_drone_aws_secret_access_key | default(omit) }}"
+  AWS_DEFAULT_REGION: "us-east-1"
+  AWS_REGION: "us-east-1"
+
+# @var docker_container_drone_volumes:description: >
+# List of volumes to mount within the container.
+# @end
+docker_container_drone_volumes:
+  - "{{ docker_container_drone_volume_dir }}/var/lib/drone:/var/lib/drone"
+  - "{{ docker_container_drone_volume_dir }}/data:/data"
+
+# @var docker_container_drone_labels:description: >
+# Dictionary of key value pairs for container labels. 
+# 
+# Example:
+#
+# ```yaml
+# 
+# docker_container_drone_labels:
+#
+#   traefik.enable: "true"
+# 
+# ```
+# 
+# @end
+docker_container_drone_labels: {}
+
+# @var docker_container_drone_networks:description: >
+# List of networks the container belongs to.
+# @end
+docker_container_drone_networks:
+  - name: "{{ docker_network_drone_name }}"
+
+# @var docker_container_drone_ports:description: >
+# List of ports to publish from the container to the host.
+# @end
+docker_container_drone_ports:
+  - "3001:80"
+
+# docker_container_drone_auto_remove: no 
+# docker_container_drone_detach: yes 
+# docker_container_drone_env_file: "{{ docker_container_drone_volume_dir }}/.env"
+# docker_container_drone_init: no 
+# docker_container_drone_interactive: no 
+# docker_container_drone_keep_volumes: yes
+# docker_container_drone_memory: "0"
+# docker_container_drone_paused: no 
+# docker_container_drone_privileged: no 
+# docker_container_drone_pull: no
+# docker_container_drone_purge_networks: yes 
+# docker_container_drone_read_only: no 
+# docker_container_drone_recreate: no
+# docker_container_drone_restart: no
+# docker_container_drone_restart_policy: always 
+# docker_container_drone_state: started
+# docker_container_drone_tty: no 
+# docker_container_drone_networks_cli_compatible: yes 
+
+# docker_container_drone_s3_endpoint: "https://minio.acme.org"
+# docker_container_drone_s3_bucket: "drone"
+# docker_container_drone_aws_access_key_id: "minio"
+# docker_container_drone_aws_secret_access_key: "minio_sample_secret"
+
+# --------------
+# Docker network
+# --------------
+
+# @var docker_network_drone_name:description: >
+# Name of the docker network created for drone.
+# @end
+docker_network_drone_name: "{{ docker_container_drone_name }}_backend"
+# docker_network_drone_driver: bridge
+# docker_network_drone_attachable: yes
+# docker_network_drone_enable_ipv6: no
+# docker_network_drone_internal: no
+
+# -------------
+# Restic Backup
+# -------------
+
+# @var docker_container_drone_restic_enable:description: >
+# Enable restic backup for the container's mounted volumes.
+# @end
+docker_container_drone_restic_enable: false
+
+# @var docker_container_drone_restic_s3_endpoint:description: >
+# Minio S3 endpoint for restic backup storage.
+#
+# Example: 
+# 
+# ```yaml
+#
+# docker_container__base__restic_s3_endpoint: "https://minio.{{ dns_domain }}"
+#
+# docker_container_drone_restic_s3_endpoint: "{{ docker_container__base__restic_s3_endpoint }}"
+#
+# ```
+#
+# @end
+docker_container_drone_restic_s3_endpoint: "{{ docker_container__base__restic_s3_endpoint }}"
+
+# @var docker_container_drone_restic_s3_bucket_name:description: >
+# Minio S3 bucket name for restic backup storage.
+# @end
+docker_container_drone_restic_s3_bucket_name: "restic-{{ docker_container_drone_name }}"
+
+# @var docker_container_drone_restic_s3_repo:description: >
+# Minio S3 repo URL for restic backup storage.
+# @end
+docker_container_drone_restic_s3_repo: "s3:{{ docker_container_drone_restic_s3_endpoint }}/{{ docker_container_drone_restic_s3_bucket_name }}"
+
+# @var docker_container_drone_restic_s3_repo_password:description: >
+# Minio S3 repo password for restic backup storage.
+# @end
+docker_container_drone_restic_s3_repo_password: "{{ docker_container__base__restic_s3_repo_password }}"
+
+# @var docker_container_drone_restic_s3_repo_access_key:description: >
+# Minio S3 repo access key for restic backup storage.
+# @end
+docker_container_drone_restic_s3_repo_access_key: "{{ docker_container__base__restic_s3_repo_access_key }}"
+
+# @var docker_container_drone_restic_s3_repo_secret_key:description: >
+# Minio S3 repo secret key for restic backup storage.
+# @end
+docker_container_drone_restic_s3_repo_secret_key: "{{ docker_container__base__restic_s3_repo_secret_key }}"
+
+# docker_container_drone_restic_s3_seed_repo: "s3:{{ docker_container__base__restic_s3_seed_endpoint }}/{{ docker_container_drone_restic_s3_bucket_name }}"
+# docker_container_drone_restic_s3_seed_repo_password: "{{ docker_container__base__restic_s3_repo_password }}"
+
+# @var docker_container_drone_restic_retention:description: >
+# Retention settions for `restic forget` after the `restic backup`.
+# @end
+docker_container_drone_restic_retention:
+  keep_last: 1
+  # keep_hourly: 1
+  keep_daily: 7
+  keep_weekly: 4
+  # keep_monthly: 6
+  # keep_yearly
+
+# @var docker_container_drone_restic_tag:description: >
+# Tag for the `restic backup` command
+# @end
+docker_container_drone_restic_tag: "{{ docker_container_drone_name }}"
+
+
+
+# ------------
+# Docker image
+# ------------
+
+# @var docker_image_dronerunner_name:description: Repository path and tag for the container image.
+docker_image_dronerunner_name: "drone/drone-runner-docker:1"
+
+# @var docker_image_dronerunner_pull:description: Indicate to always pull the docker image.
+docker_image_dronerunner_pull: no
+
+# ----------------
+# Docker container
+# ----------------
+
+# @var docker_container_dronerunner_name:description: Name for the container
+docker_container_dronerunner_name: "dronerunner"
+
+# @var docker_container_dronerunner_image:description: >
+# Repository path and tag used to create the container. 
+# If an image is not found or pull is true, the image will be pulled from the registry. 
+# If no tag is included, latest will be used.
+# @end
+docker_container_dronerunner_image: "{{ docker_image_dronerunner_name }}"
+
+# @var docker_container_dronerunner_volume_dir:description: >
+# Volume mount host directory, where Treafik config files are stored.
+# @end
+docker_container_dronerunner_volume_dir: "{{ docker_container__base__volume_dir }}/{{ docker_container_drone_name }}"
+
+# @var docker_container_dronerunner_env:description: >
+# Dictionery of key,value pairs for docker 
+# environment variables to configure drone runner.
+# @end
+docker_container_dronerunner_env:
+  DRONE_RPC_PROTO: "http"
+  DRONE_RPC_HOST: "drone-server"
+  DRONE_RPC_SECRET: "UAv3Y67LpLL3NrsbbSaV2qhHkSjoJARF"
+  DRONE_RUNNER_CAPACITY: "2"
+  DRONE_RUNNER_NAME: "localhost"
+
+# @var docker_container_dronerunner_volumes:description: >
+# List of volumes to mount within the container.
+# @end
+docker_container_dronerunner_volumes:
+  - "/var/run/docker.sock:/var/run/docker.sock"
+
+# @var docker_container_dronerunner_labels:description: >
+# Dictionary of key value pairs for container labels. 
+# 
+# Example:
+#
+# ```yaml
+# 
+# docker_container_dronerunner_labels:
+#
+#   traefik.enable: "true"
+# 
+# ```
+# 
+# @end
+docker_container_dronerunner_labels: {}
+
+# @var docker_container_dronerunner_networks:description: >
+# List of networks the container belongs to.
+# @end
+docker_container_dronerunner_networks:
+  - name: "{{ docker_network_drone_name }}"
+    links:
+      - "{{ docker_container_drone_name }}:drone-server"
+
+
+# docker_container_dronerunner_auto_remove: no 
+# docker_container_dronerunner_detach: yes 
+# docker_container_dronerunner_env_file: "{{ docker_container_drone_volume_dir }}/.env"
+# docker_container_dronerunner_init: no 
+# docker_container_dronerunner_interactive: no 
+# docker_container_dronerunner_keep_volumes: yes
+# docker_container_dronerunner_memory: "0"
+# docker_container_dronerunner_paused: no 
+# docker_container_dronerunner_privileged: no 
+# docker_container_dronerunner_pull: no
+# docker_container_dronerunner_purge_networks: yes 
+# docker_container_dronerunner_read_only: no 
+# docker_container_dronerunner_recreate: no
+# docker_container_dronerunner_restart: no
+# docker_container_dronerunner_restart_policy: always 
+# docker_container_dronerunner_state: started
+# docker_container_dronerunner_tty: no 
+# docker_container_dronerunner_networks_cli_compatible: yes 
+
+# --------------
+# Docker network
+# --------------
+
+# @var docker_network_dronerunner_name:description: >
+# Name of the docker network created for drone runner.
+# @end
+docker_network_dronerunner_name: "{{ docker_container_drone_name }}_backend"
+# docker_network_dronerunner_driver: bridge
+# docker_network_dronerunner_attachable: yes
+# docker_network_dronerunner_enable_ipv6: no
+# docker_network_dronerunner_internal: no

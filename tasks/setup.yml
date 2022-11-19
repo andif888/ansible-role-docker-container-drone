@@ -1,0 +1,110 @@
+---
+# tasks file for ansible-role-docker-container-drone
+- name: docker_container {{ docker_container_drone_name }} - Ensure S3 bucket exists
+  shell: |
+    mc alias set statelessminio {{ docker_container_drone_s3_endpoint }} {{ docker_container_drone_aws_access_key_id }} {{ docker_container_drone_aws_secret_access_key }}
+    mc mb --ignore-existing statelessminio/{{ docker_container_drone_s3_bucket }}
+  register: mc_mb_result
+  when: 
+    - docker_container_drone_s3_endpoint is defined
+    - docker_container_drone_s3_endpoint | length > 0
+    - docker_container_drone_s3_bucket is defined
+    - docker_container_drone_s3_bucket | length > 0
+
+- name: docker_container {{ docker_container_drone_name }} - Ensure S3 bucket exists result
+  debug:
+    msg: "{{ mc_mb_result.stdout }}"
+  when:
+    - mc_mb_result is defined
+    - mc_mb_result.stdout is defined
+
+
+- name: docker_image pull {{ docker_image_drone_name }}
+  community.docker.docker_image:
+    name: '{{ docker_image_drone_name }}'
+    source: pull
+    # Select platform for pulling. If not specified, will pull whatever docker prefers.
+    pull:
+      platform: amd64
+  when: 
+    - docker_image_drone_pull is defined
+
+- name: docker_image pull {{ docker_image_dronerunner_name }}
+  community.docker.docker_image:
+    name: '{{ docker_image_dronerunner_name }}'
+    source: pull
+    # Select platform for pulling. If not specified, will pull whatever docker prefers.
+    pull:
+      platform: amd64
+  when: 
+    - docker_image_dronerunner_pull is defined
+
+- name: docker_network {{ docker_container_drone_name }}
+  community.docker.docker_network:
+    name: "{{ docker_network_drone_name }}"
+    driver: "{{ docker_network_drone_driver | default('bridge') }}"
+    attachable: "{{ docker_network_drone_attachable | default('yes') }}"
+    enable_ipv6: "{{ docker_network_drone_enable_ipv6 | default('no') }}"
+    internal: "{{ docker_network_drone_internal | default('no') }}"
+    state: present
+
+
+- name: docker_container {{ docker_container_drone_name }}
+  community.docker.docker_container:
+    name: "{{ docker_container_drone_name }}"
+    image: "{{ docker_container_drone_image }}"
+    state: "{{ docker_container_drone_state | default('started') }}"
+    recreate: "{{ docker_container_drone_recreate | default('no') }}"
+    restart: "{{ docker_container_drone_restart | default('no') }}"
+    restart_policy: "{{ docker_container_drone_restart_policy | default('always') }}"
+    container_default_behavior: no_defaults
+    auto_remove: "{{ docker_container_drone_auto_remove | default('no') }}"
+    detach: "{{ docker_container_drone_detach | default('yes') }}"
+    init: "{{ docker_container_drone_init | default('no') }}"
+    interactive: "{{ docker_container_drone_interactive | default('no') }}"
+    keep_volumes: "{{ docker_container_drone_keep_volumes | default('yes') }}"
+    memory: "{{ docker_container_drone_memory | default('0') }}"
+    paused: "{{ docker_container_drone_paused | default('no') }}"
+    privileged: "{{ docker_container_drone_privileged | default('no') }}"
+    read_only: "{{ docker_container_drone_read_only | default('no') }}"
+    tty: "{{ docker_container_drone_tty | default('no') }}"
+    env_file: "{{ docker_container_drone_env_file | default(omit) }}"
+    env: "{{ docker_container_drone_env | default(omit) }}"
+    volumes: "{{ docker_container_drone_volumes | default(omit) }}"
+    labels: "{{ docker_container_drone_labels | default(omit) }}"
+    networks_cli_compatible: "{{ docker_container_drone_networks_cli_compatible | default('yes') }}"
+    network_mode: "{{ docker_network_drone_name }}"
+    pull: "{{ docker_container_drone_pull | default('no') }}"
+    purge_networks: "{{ docker_container_drone_purge_networks | default('yes') }}"
+    networks: "{{ docker_container_drone_networks }}"
+    published_ports: "{{ docker_container_drone_ports | default(omit) }}"
+
+- name: docker_container {{ docker_container_dronerunner_name }}
+  community.docker.docker_container:
+    name: "{{ docker_container_dronerunner_name }}"
+    image: "{{ docker_container_dronerunner_image }}"
+    state: "{{ docker_container_dronerunner_state | default('started') }}"
+    recreate: "{{ docker_container_dronerunner_recreate | default('no') }}"
+    restart: "{{ docker_container_dronerunner_restart | default('no') }}"
+    restart_policy: "{{ docker_container_dronerunner_restart_policy | default('always') }}"
+    container_default_behavior: no_defaults
+    auto_remove: "{{ docker_container_dronerunner_auto_remove | default('no') }}"
+    detach: "{{ docker_container_dronerunner_detach | default('yes') }}"
+    init: "{{ docker_container_dronerunner_init | default('no') }}"
+    interactive: "{{ docker_container_dronerunner_interactive | default('no') }}"
+    keep_volumes: "{{ docker_container_dronerunner_keep_volumes | default('yes') }}"
+    memory: "{{ docker_container_dronerunner_memory | default('0') }}"
+    paused: "{{ docker_container_dronerunner_paused | default('no') }}"
+    privileged: "{{ docker_container_dronerunner_privileged | default('no') }}"
+    read_only: "{{ docker_container_dronerunner_read_only | default('no') }}"
+    tty: "{{ docker_container_dronerunner_tty | default('no') }}"
+    env_file: "{{ docker_container_dronerunner_env_file | default(omit) }}"
+    env: "{{ docker_container_dronerunner_env | default(omit) }}"
+    volumes: "{{ docker_container_dronerunner_volumes | default(omit) }}"
+    labels: "{{ docker_container_dronerunner_labels | default(omit) }}"
+    networks_cli_compatible: "{{ docker_container_dronerunner_networks_cli_compatible | default('yes') }}"
+    network_mode: "{{ docker_network_dronerunner_name }}"
+    pull: "{{ docker_container_dronerunner_pull | default('no') }}"
+    purge_networks: "{{ docker_container_dronerunner_purge_networks | default('yes') }}"
+    networks: "{{ docker_container_dronerunner_networks }}"
+    published_ports: "{{ docker_container_dronerunner_ports | default(omit) }}"
