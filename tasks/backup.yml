@@ -7,13 +7,13 @@
 # - debug:
 #     var: docker_container_info_result
 
-- name: docker_container stop {{ docker_container_drone_name }}
-  community.docker.docker_container:
-    name: "{{ docker_container_drone_name }}"
-    state: stopped
-  when:
-    - docker_container_info_result.exists
-    - docker_container_info_result.container.State.Running
+# - name: docker_container stop {{ docker_container_drone_name }}
+#   community.docker.docker_container:
+#     name: "{{ docker_container_drone_name }}"
+#     state: stopped
+#   when:
+#     - docker_container_info_result.exists
+#     - docker_container_info_result.container.State.Running
 
 - name: backup {{ docker_container_drone_volume_dir }}
   ansible.builtin.shell: |
@@ -32,13 +32,13 @@
   when:
     - backup_result is defined
 
-- name: docker_container start {{ docker_container_drone_name }}
-  community.docker.docker_container:
-    name: "{{ docker_container_drone_name }}"
-    state: started
-  when:
-    - docker_container_info_result.exists
-    - docker_container_info_result.container.State.Running
+# - name: docker_container start {{ docker_container_drone_name }}
+#   community.docker.docker_container:
+#     name: "{{ docker_container_drone_name }}"
+#     state: started
+#   when:
+#     - docker_container_info_result.exists
+#     - docker_container_info_result.container.State.Running
 
 - name: backup_retention {{ docker_container_drone_volume_dir }}
   ansible.builtin.shell: |
