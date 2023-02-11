@@ -22,6 +22,7 @@
 - name: docker_image pull {{ docker_image_drone_name }}
   community.docker.docker_image:
     name: '{{ docker_image_drone_name }}'
+    force_source: true
     source: pull
     # Select platform for pulling. If not specified, will pull whatever docker prefers.
     pull:
@@ -32,6 +33,7 @@
 - name: docker_image pull {{ docker_image_dronerunner_name }}
   community.docker.docker_image:
     name: '{{ docker_image_dronerunner_name }}'
+    force_source: true
     source: pull
     # Select platform for pulling. If not specified, will pull whatever docker prefers.
     pull:
@@ -52,6 +54,7 @@
 - name: docker_container {{ docker_container_drone_name }}
   community.docker.docker_container:
     name: "{{ docker_container_drone_name }}"
+    comparisons: "{{ docker_container_drone_comparisons }}"
     image: "{{ docker_container_drone_image }}"
     state: "{{ docker_container_drone_state | default('started') }}"
     recreate: "{{ docker_container_drone_recreate | default('no') }}"
@@ -75,13 +78,13 @@
     networks_cli_compatible: "{{ docker_container_drone_networks_cli_compatible | default('yes') }}"
     network_mode: "{{ docker_network_drone_name }}"
     pull: "{{ docker_container_drone_pull | default('no') }}"
-    purge_networks: "{{ docker_container_drone_purge_networks | default('yes') }}"
     networks: "{{ docker_container_drone_networks }}"
     published_ports: "{{ docker_container_drone_ports | default(omit) }}"
 
 - name: docker_container {{ docker_container_dronerunner_name }}
   community.docker.docker_container:
     name: "{{ docker_container_dronerunner_name }}"
+    comparisons: "{{ docker_container_dronerunner_comparisons }}"
     image: "{{ docker_container_dronerunner_image }}"
     state: "{{ docker_container_dronerunner_state | default('started') }}"
     recreate: "{{ docker_container_dronerunner_recreate | default('no') }}"
@@ -105,6 +108,5 @@
     networks_cli_compatible: "{{ docker_container_dronerunner_networks_cli_compatible | default('yes') }}"
     network_mode: "{{ docker_network_dronerunner_name }}"
     pull: "{{ docker_container_dronerunner_pull | default('no') }}"
-    purge_networks: "{{ docker_container_dronerunner_purge_networks | default('yes') }}"
     networks: "{{ docker_container_dronerunner_networks }}"
     published_ports: "{{ docker_container_dronerunner_ports | default(omit) }}"

@@ -87,6 +87,15 @@ docker_container_drone_networks:
 docker_container_drone_ports:
   - "3001:80"
 
+# @var docker_container_drone_comparisons:description: >
+# Allows to specify how properties of existing containers are compared with module options 
+# to decide whether the container should be recreated / updated or not.
+# @end
+docker_container_drone_comparisons:
+  image: strict
+  env: strict
+  volumes: strict
+
 # docker_container_drone_auto_remove: no 
 # docker_container_drone_detach: yes 
 # docker_container_drone_env_file: "{{ docker_container_drone_volume_dir }}/.env"
@@ -97,7 +106,6 @@ docker_container_drone_ports:
 # docker_container_drone_paused: no 
 # docker_container_drone_privileged: no 
 # docker_container_drone_pull: no
-# docker_container_drone_purge_networks: yes 
 # docker_container_drone_read_only: no 
 # docker_container_drone_recreate: no
 # docker_container_drone_restart: no
@@ -266,6 +274,15 @@ docker_container_dronerunner_networks:
       - "{{ docker_container_drone_name }}:drone-server"
 
 
+# @var docker_container_dronerunner_comparisons:description: >
+# Allows to specify how properties of existing containers are compared with module options 
+# to decide whether the container should be recreated / updated or not.
+# @end
+docker_container_dronerunner_comparisons:
+  image: strict
+  env: strict
+  volumes: strict
+
 # docker_container_dronerunner_auto_remove: no 
 # docker_container_dronerunner_detach: yes 
 # docker_container_dronerunner_env_file: "{{ docker_container_drone_volume_dir }}/.env"
@@ -276,7 +293,6 @@ docker_container_dronerunner_networks:
 # docker_container_dronerunner_paused: no 
 # docker_container_dronerunner_privileged: no 
 # docker_container_dronerunner_pull: no
-# docker_container_dronerunner_purge_networks: yes 
 # docker_container_dronerunner_read_only: no 
 # docker_container_dronerunner_recreate: no
 # docker_container_dronerunner_restart: no
