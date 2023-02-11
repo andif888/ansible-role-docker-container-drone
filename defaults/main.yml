@@ -9,7 +9,7 @@
 docker_image_drone_name: "drone/drone:2"
 
 # @var docker_image_drone_pull:description: Indicate to always pull the docker image.
-docker_image_drone_pull: no
+docker_image_drone_pull: false
 
 # ----------------
 # Docker container
@@ -211,7 +211,7 @@ docker_container_drone_restic_tag: "{{ docker_container_drone_name }}"
 docker_image_dronerunner_name: "drone/drone-runner-docker:1"
 
 # @var docker_image_dronerunner_pull:description: Indicate to always pull the docker image.
-docker_image_dronerunner_pull: no
+docker_image_dronerunner_pull: false
 
 # ----------------
 # Docker container
